@@ -1,4 +1,3 @@
-"
 " =====================================================================
 " ========                                    .-----.          ========
 " ========         .----------------------.   | === |          ========
@@ -41,6 +40,7 @@ let maplocalleader = ' '
 " For more information, see `:h vim_diff.txt` in Neovim
 filetype on
 syntax on
+set t_Co=256
 set autoindent autoread background=dark
 set backspace=indent,eol,start belloff=all
 set display=lastline encoding=utf-8 hidden
@@ -48,6 +48,8 @@ set history=10000 incsearch
 set nojoinspaces laststatus=2 ruler
 set showcmd smarttab nostartofline
 set switchbuf=uselast wildmenu "wildoptions=pum,tagfile
+let g:airline_powerline_fonts=1
+let g:airline_section_z = "%3p%% %1:%c"
 
 " [[ Settings other options ]]
 " See `:help :set`
@@ -58,10 +60,14 @@ set switchbuf=uselast wildmenu "wildoptions=pum,tagfile
 set number
 " You can also add relative line numbers, to help with jumping.
 "  Experiment for yourself to see if you like it!
-"set relativenumber
+set relativenumber
+
+set foldmethod=syntax
+set nofoldenable
 
 " Enable mouse mode, can be useful for resizing splits for example!
 set mouse=a
+"set mouse=r
 
 " Don't show the mode, since it's already in the status line
 set noshowmode
@@ -78,7 +84,7 @@ set breakindent
 "  By default, undo files (.file.txt.un~) are saved in the current directory.
 "  This makes the file system very messy, so undofile is disabled by default.
 "
-"  If would like to enable undofile, I recommend you to change undodir:
+"CG  If would like to enable undofile, I recommend you to change undodir:
 "  1. Create the undo directory: `:! mkdir -p ~/.local/state/vim/undo`
 "  2. Uncomment the following line starting with "set undodir" and save the file
 "  3. Source the .vimrc: `:source ~/.vimrc`
@@ -100,7 +106,7 @@ set signcolumn=yes
 set updatetime=250
 
 " Decrease mapped sequence wait time
-" Displays vim-which-key sooner
+" Displays vi/m-which-key sooner
 set timeoutlen=300
 
 " Configure how new splits should be opened
@@ -127,10 +133,15 @@ set confirm
 
 " [[ Basic Keymaps ]]
 
+" use hg to go back to normal mode
+inoremap hg <Esc>l
+inoremap HG <Esc>l
+
 " Set highlight on search, but clear on pressing <Esc> in normal mode
 set hlsearch
 nnoremap <Esc> :nohlsearch<CR>
-
+" hope that it fix the replace startup-mode bug
+nnoremap <esc>^[ <esc>^[
 " Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 " for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 " is not what someone will guess without a bit more experience.
@@ -144,10 +155,10 @@ nnoremap <expr> <silent> k v:count == 0 ? 'gk' : 'k'
 nnoremap <expr> <silent> j v:count == 0 ? 'gj' : 'j'
 
 " TIP: Disable arrow keys in normal mode
-nnoremap <left> :echo "Use h to move!!"<CR>
-nnoremap <right> :echo "Use l to move!!"<CR>
-nnoremap <up> :echo "Use k to move!!"<CR>
-nnoremap <down> :echo "Use j to move!!"<CR>
+"nnoremap <left> :echo "Use h to move!!"<CR>
+"nnoremap <right> :echo "Use l to move!!"<CR>
+"nnoremap <up> :echo "Use k to move!!"<CR>
+"nnoremap <down> :echo "Use j to move!!"<CR>
 
 " Keybinds to make split navigation easier.
 "  Use CTRL+<hjkl> to switch between windows
@@ -204,8 +215,18 @@ Plug 'prabirshrestha/asyncomplete-lsp.vim'
 " Colorscheme
 Plug 'ghifarit53/tokyonight-vim'
 
+" Add git info to airline
+Plug 'tpope/vim-fugitive'
+
 " Set airline as statusline
 Plug 'vim-airline/vim-airline'
+
+" Nerdtree
+Plug 'preservim/nerdtree'
+
+" Vimspector
+Plug 'puremourning/vimspector'
+
 call plug#end()
 
 
@@ -213,7 +234,7 @@ call plug#end()
 " Set colorscheme
 set termguicolors                   " Enable RGB colors
 let g:tokyonight_style = 'night'    " available: night, storm
-let g:tokyonight_enable_italic = 0  " Disable italics in comments
+let g:tokyonight_enable_italic = 1  " Disable italics in comments
 colorscheme tokyonight
 
 
@@ -226,7 +247,11 @@ nnoremap <silent> <localleader> :<c-u>WhichKey  '<Space>'<CR>
 let g:which_key_map =  {}
 let g:which_key_map.s = { 'name' : '[S]earch' }
 let g:which_key_map.h = { 'name' : 'Git [H]unk' }
-
+let g:which_key_map.c = { 'name' : '[C]ode' }
+let g:which_key_map.d = { 'name' : '[D]ocument' }
+let g:which_key_map.r = { 'name' : '[R]ename' }
+let g:which_key_map.w = { 'name' : '[W]orkspace' }
+let g:which_key_map.t = { 'name' : '[T]oggle' }
 
 " [[ Configure fzf.vim ]]
 " See `:help fzf-vim`
@@ -303,6 +328,32 @@ inoremap <expr> <CR>    pumvisible() ? asyncomplete#close_popup() : "\<CR>""
 let g:asyncomplete_auto_completeopt = 0
 set completeopt=menuone,noinsert,noselect,preview
 
+" if exists('$TMUX')
+"   let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
+"   let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
+" else
+let &t_SI = "\<Esc>[6 q"
+let &t_SR = "\<Esc>[4 q"
+let &t_EI = "\<Esc>[2 q"
+" endif
 
+" The line beneath this is called `modeline`. See `:help modeline`
+" vim: ts=2 sts=2 sw=2 et
+:autocmd insertEnter * set cursorline
+:autocmd insertLeave * set nocursorline
+
+nnoremap <leader>n :NERDTreeFocus<CR>
+"nnoremap <C-n> :NERDTree<CR>
+nnoremap <leader>t :NERDTreeToggle<CR>
+nnoremap <leader>f :NERDTreeFind<CR>
+
+let g:vimspector_enable_mappings = 'HUMAN'
+let g:vimspector_install_gadgets = [ 'debugpy', 'vscode-cpptools', 'CodeLLDB' ]
+nmap <leader>dd :call Vimspector#Launch()<CR>
+nmap <leader>dx :VimspectorReset<CR>
+nmap <leader>de :VimspectorEval
+nmap <leader>dp :VimspectorWatch
+nmap <leader>do :VimspectorShowOutput
+autocmd FileType cc nmap <leader>dd :CocCommand cc.debug.vimspector.start<CR>
 " The line beneath this is called `modeline`. See `:help modeline`
 " vim: ts=2 sts=2 sw=2 et
