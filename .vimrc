@@ -227,6 +227,9 @@ Plug 'preservim/nerdtree'
 " Vimspector
 Plug 'puremourning/vimspector'
 
+" Vim-visual-multi
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+
 call plug#end()
 
 
