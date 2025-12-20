@@ -33,7 +33,8 @@
 let mapleader=' '
 let maplocalleader = ' '
 
-
+" editing this config file
+nnoremap <leader>v :e $MYVIMRC<CR>
 " [[ Setting Neovim default options ]]
 " These are some of the options enabled by default in Neovim
 " These are options believed by many Vim users to be essential.
@@ -50,6 +51,7 @@ set showcmd smarttab nostartofline
 set switchbuf=uselast wildmenu "wildoptions=pum,tagfile
 let g:airline_powerline_fonts=1
 let g:airline_section_z = "%3p%% %1:%c"
+let g:VM_leader = "\\"
 
 " [[ Settings other options ]]
 " See `:help :set`
@@ -80,6 +82,8 @@ set clipboard=unnamedplus
 " Enable break indent
 set breakindent
 
+set nocompatible
+
 " Save undo history
 "  By default, undo files (.file.txt.un~) are saved in the current directory.
 "  This makes the file system very messy, so undofile is disabled by default.
@@ -107,7 +111,7 @@ set updatetime=250
 
 " Decrease mapped sequence wait time
 " Displays vi/m-which-key sooner
-set timeoutlen=300
+set timeoutlen=500
 
 " Configure how new splits should be opened
 set splitright
@@ -139,7 +143,8 @@ inoremap HG <Esc>l
 
 " Set highlight on search, but clear on pressing <Esc> in normal mode
 set hlsearch
-nnoremap <Esc> :nohlsearch<CR>
+nnoremap <Esc>   :nohlsearch<CR>
+nnoremap <Enter> :nohlsearch<CR>
 " hope that it fix the replace startup-mode bug
 nnoremap <esc>^[ <esc>^[
 " Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
@@ -187,11 +192,15 @@ endif
 "
 " Note: Here is where you install your plugins.
 call plug#begin()
+
 " Detect tabstop and shiftwidth automatically
 Plug 'tpope/vim-sleuth'
-
 " "gc" to comment visual regions/lines
 Plug 'tpope/vim-commentary'
+" Add git info to airline
+Plug 'tpope/vim-fugitive'
+" Delete/change/add surrounds
+Plug 'tpope/vim-surround'
 
 " Adds git related signs to the gutter
 Plug 'airblade/vim-gitgutter'
@@ -214,9 +223,6 @@ Plug 'prabirshrestha/asyncomplete-lsp.vim'
 
 " Colorscheme
 Plug 'ghifarit53/tokyonight-vim'
-
-" Add git info to airline
-Plug 'tpope/vim-fugitive'
 
 " Set airline as statusline
 Plug 'vim-airline/vim-airline'
@@ -251,7 +257,7 @@ let g:which_key_map =  {}
 let g:which_key_map.s = { 'name' : '[S]earch' }
 let g:which_key_map.h = { 'name' : 'Git [H]unk' }
 let g:which_key_map.c = { 'name' : '[C]ode' }
-let g:which_key_map.d = { 'name' : '[D]ocument' }
+let g:which_key_map.d = { 'name' : '[D]ebug' }
 let g:which_key_map.r = { 'name' : '[R]ename' }
 let g:which_key_map.w = { 'name' : '[W]orkspace' }
 let g:which_key_map.t = { 'name' : '[T]oggle' }
@@ -352,11 +358,49 @@ nnoremap <leader>f :NERDTreeFind<CR>
 
 let g:vimspector_enable_mappings = 'HUMAN'
 let g:vimspector_install_gadgets = [ 'debugpy', 'vscode-cpptools', 'CodeLLDB' ]
-nmap <leader>dd :call Vimspector#Launch()<CR>
-nmap <leader>dx :VimspectorReset<CR>
-nmap <leader>de :VimspectorEval
-nmap <leader>dp :VimspectorWatch
-nmap <leader>do :VimspectorShowOutput
-autocmd FileType cc nmap <leader>dd :CocCommand cc.debug.vimspector.start<CR>
+
+" puremourning/vimspector
+fun! GotoWindow(id)
+  :call win_gotoid(a:id)
+endfun
+func! AddToWatch()
+  let word = expand("<cexpr>")
+  call Vimspector#AddWatch(word)
+endfunction
+" let g:vimspector_base_dir = expand('$HOME/.config/vimspector-config')
+let g:vimspector_sidebar_width = 60
+nnoremap <leader>dd :call vimspector#Launch()<CR>
+nnoremap <leader>dc :call GotoWindow(g:vimspector_session_windows.code)<CR>
+nnoremap <leader>dv :call GotoWindow(g:vimspector_session_windows.variables)<CR>
+nnoremap <leader>dw :call GotoWindow(g:vimspector_session_windows.watches)<CR>
+nnoremap <leader>ds :call GotoWindow(g:vimspector_session_windows.stack_trace)<CR>
+nnoremap <leader>do :call GotoWindow(g:vimspector_session_windows.output)<CR>
+nnoremap <leader>dx :call vimspector#Reset()<CR>
+nnoremap <leader>dX :call vimspector#ClearBreakpoints()<CR>
+nnoremap <A-up> :call vimspector#StepOut()<CR>
+nnoremap <A-right> :call vimspector#StepInto()<CR>
+nnoremap <A-down> :call vimspector#StepOver()<CR>
+nnoremap <leader>d_ :call vimspector#Restart()<CR>
+nnoremap <leader>dn :call vimspector#Continue()<CR>
+nnoremap <leader>dr :call vimspector#RunToCursor()<CR>
+nnoremap <leader>db :call vimspector#ListBreakpoints()<CR>
+nnoremap <leader>dt :call vimspector#ToggleBreakpoint()<CR>
+nnoremap <leader>dcb :call vimspector#ToggleConditionalBreakpoint()<CR>
+nnoremap <leader>de :VimspectorEval
+nnoremap <leader>dp :VimspectorWatch
+nnoremap <leader>do :VimspectorShowOutput
+" mnemonic 'di' = 'debug inspect' (pick your own, if you prefer!)
+" for normal mode - the word under the cursor
+nmap <Leader>di <Plug>VimspectorBalloonEval
+" for visual mode, the visually selected text
+xmap <Leader>di <Plug>VimspectorBalloonEval
+ let g:vimspector_sign_priority = {
+   \    'vimspectorBP':         998,
+   \    'vimspectorBPCond':     997,
+   \    'vimspectorBPDisabled': 996,
+   \    'vimspectorPC':         999,
+   \ }
+" autocmd FileType cc nmap <leader>dd :CocCommand cc.debug.vimspector.start<CR>
+
 " The line beneath this is called `modeline`. See `:help modeline`
 " vim: ts=2 sts=2 sw=2 et
