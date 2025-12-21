@@ -174,6 +174,10 @@ nnoremap <C-l> <C-w><C-l>
 nnoremap <C-j> <C-w><C-j>
 nnoremap <C-k> <C-w><C-k>
 
+nnoremap <C-left> <C-w><C-h>
+nnoremap <C-right> <C-w><C-l>
+nnoremap <C-down> <C-w><C-j>
+nnoremap <C-up> <C-w><C-k>
 
 " [[ Install `vim-plug` plugin manager ]]
 "    See https://github.com/junegunn/vim-plug/ for more info
