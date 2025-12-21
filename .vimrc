@@ -179,6 +179,9 @@ nnoremap <C-right> <C-w><C-l>
 nnoremap <C-down> <C-w><C-j>
 nnoremap <C-up> <C-w><C-k>
 
+
+packadd termdebug
+
 " [[ Install `vim-plug` plugin manager ]]
 "    See https://github.com/junegunn/vim-plug/ for more info
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
