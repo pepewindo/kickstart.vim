@@ -243,6 +243,9 @@ Plug 'puremourning/vimspector'
 " Vim-visual-multi
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
+" Tabularize, align texts with delimiters
+Plug 'godlygeek/tabular'
+
 call plug#end()
 
 
