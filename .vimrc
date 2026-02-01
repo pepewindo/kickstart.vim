@@ -49,6 +49,8 @@ set history=10000 incsearch
 set nojoinspaces laststatus=2 ruler
 set showcmd smarttab nostartofline
 set switchbuf=uselast wildmenu "wildoptions=pum,tagfile
+set tabstop=4 shiftwidth=4 expandtab
+filetype plugin indent on
 let g:airline_powerline_fonts=1
 let g:airline_section_z = "%3p%% %1:%c"
 let g:VM_leader = "\\"
@@ -204,11 +206,13 @@ call plug#begin()
 Plug 'tpope/vim-sleuth'
 " "gc" to comment visual regions/lines
 Plug 'tpope/vim-commentary'
-" Add git info to airline
-Plug 'tpope/vim-fugitive'
 " Delete/change/add surrounds
 Plug 'tpope/vim-surround'
+" Auto-pairs
+Plug 'jiangmiao/auto-pairs'
 
+" Add git info to airline
+Plug 'tpope/vim-fugitive'
 " Adds git related signs to the gutter
 Plug 'airblade/vim-gitgutter'
 
@@ -312,19 +316,19 @@ function! s:on_lsp_buffer_enabled() abort
   nnoremap <buffer> ]d <plug>(lsp-next-diagnostic)
   " See `:help K` for why this keymap
   nnoremap <buffer> K <plug>(lsp-hover)
-  nnoremap <buffer> grn <plug>(lsp-rename)
-  nnoremap <buffer> gra <plug>(lsp-code-action-float)
-  nnoremap <buffer> grr <plug>(lsp-references)
-  nnoremap <buffer> gri <plug>(lsp-implementation)
-  nnoremap <buffer> gO <plug>(lsp-document-symbol-search)
+  nnoremap <buffer> gn <plug>(lsp-rename)
+  nnoremap <buffer> <leader>ca <plug>(lsp-code-action-float)
+  nnoremap <buffer> gr <plug>(lsp-references)
+  nnoremap <buffer> gi <plug>(lsp-implementation)
+  nnoremap <buffer> gs <plug>(lsp-document-symbol-search)
   nnoremap <buffer> <C-s> <plug>(lsp-signature-help)
 
   " Other useful functions
-  nnoremap <buffer> grd <plug>(lsp-definition)
+  nnoremap <buffer> gd <plug>(lsp-definition)
   " In C, this would take you to the header file
-  nnoremap <buffer> grD <plug>(lsp-declaration)
-  nnoremap <buffer> grt <plug>(lsp-peek-type-definition)
-  nnoremap <buffer> gW <plug>(lsp-workspace-symbol-search)
+  nnoremap <buffer> gD <plug>(lsp-declaration)
+  nnoremap <buffer> gt <plug>(lsp-peek-type-definition)
+  nnoremap <buffer> gS <plug>(lsp-workspace-symbol-search)
 
   " Formatting
   let g:lsp_format_sync_timeout = 1000
